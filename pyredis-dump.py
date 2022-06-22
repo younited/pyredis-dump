@@ -114,9 +114,7 @@ def options2kw(options):
   kw={'db':options.db}
   if options.socket: kw['unix_socket_path']=options.socket
   else:
-    kw['host']=options.host
-    kw['port']=options.port
-  if options.password: kw['password']=options.password
+  if options['ssl']: kw['ssl']=options['ssl']
   return kw
 
 def main():
@@ -135,7 +133,7 @@ def main():
   parser.add_option("-t", action="store_true", dest="use_ttl", help="use ttl when in restore mode")
   parser.add_option('-b', '--bulk', help='restore bulk size', default=1000, type="int")
   options, args = parser.parse_args()
-  if len(args)!=1:
+  parser.add_argument('-x', '--ssl', action='store_true', dest="ssl", help='connect with SSL (default false)', default=False)
     parser.print_help()
     parser.error("wrong number of arguments")
     
