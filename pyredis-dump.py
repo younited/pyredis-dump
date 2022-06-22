@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import time
-import optparse
+import configargparse
 import ast
 import pathlib
 import re
@@ -111,44 +111,48 @@ def dblist(**kw):
     print(i.replace("db", ""))
 
 def options2kw(options):
-  kw={'db':options.db}
-  if options.socket: kw['unix_socket_path']=options.socket
+  kw={'db':options['db']}
+  if options['socket']: kw['unix_socket_path']=options['socket']
   else:
+    kw['host']=options['host']
+    kw['port']=options['port']
+  if options['password']: kw['password']=options['password']
   if options['ssl']: kw['ssl']=options['ssl']
   return kw
+  
 
 def main():
   host = 'localhost'
   db = 0
-  parser = optparse.OptionParser(usage="usage: %prog [options] dump|restore|dblist")
-  parser.add_option('-H', '--host', help='connect to HOST (default localhost)', default='localhost')
+  parser = configargparse.ArgParser()
+  parser.add_argument('mode', nargs='+', help='[dump|restore|dblist]')
   parser.add_argument('-c', '--config-file', required=False, is_config_file=True, help='config file path')
-  parser.add_option('-s', '--socket', help='connect to SOCKET')
-  parser.add_option('-d', '--db', help='database', default=0, type="int")
-  parser.add_option('-w', '--password', help='connect with PASSWORD')
-  parser.add_option('-p', '--pattern', help='pattern', default='*')
-  parser.add_option('-o', '--outfile', help='write to OUTFILE')
-  parser.add_option('-i', '--infile', help='read from INFILE')
-  # parser.add_option("-e", action="store_true", dest="use_expire_at", help="use expire_at when in restore mode")
-  parser.add_option("-t", action="store_true", dest="use_ttl", help="use ttl when in restore mode")
-  parser.add_option('-b', '--bulk', help='restore bulk size', default=1000, type="int")
-  options, args = parser.parse_args()
+  parser.add_argument('-H', '--host', help='connect to HOST (default localhost)', default='localhost')
+  parser.add_argument('-P', '--port', help='connect to PORT (default 6379)', default=6379, type=int)
+  parser.add_argument('-s', '--socket', help='connect to SOCKET')
+  parser.add_argument('-d', '--db', help='database', default=0, type=int)
+  parser.add_argument('-w', '--password', help='connect with PASSWORD')
+  parser.add_argument('-p', '--pattern', help='pattern', default='*')
+  parser.add_argument('-o', '--outfile', help='write to OUTFILE')
+  parser.add_argument('-i', '--infile', help='read from INFILE')
+  parser.add_argument('-t', action='store_true', dest='use_ttl', help='use ttl when in restore mode')
+  parser.add_argument('-b', '--bulk', help='restore bulk size', default=1000, type=int)
   parser.add_argument('-x', '--ssl', action='store_true', dest="ssl", help='connect with SSL (default false)', default=False)
-    parser.print_help()
-    parser.error("wrong number of arguments")
-    
-  mode=args[0]
+  args = parser.parse_args()
+  options = vars(args)
+
+  mode = args.mode[0]
   kw = options2kw(options)
   if mode=='dump':
-    if not options.outfile: parser.error("missing outfile, use '-o'")
-    print("dumping to %r" % options.outfile)
-    print("connecting to %r" % kw)
-    dump(options.outfile, options.pattern, **kw)
+    if not options['outfile']: parser.error("missing outfile, use '-o'")
+    print("dumping to %r" % options['outfile'])
+    print("connecting to '%s:%d/%d'" % (options['host'], options['port'], options['db']))
+    dump(options['outfile'], options['pattern'], **kw)
   elif mode=='restore':
-    if not options.infile: parser.error("missing infile, use '-i'")
-    print("restore from %r" % options.infile)
-    print("connecting to %r" % kw)
-    restore(options.infile, use_ttl=options.use_ttl, bulk_size=options.bulk, **kw)
+    if not options['infile']: parser.error("missing infile, use '-i'")
+    print("restore from %r" % options['infile'])
+    print("connecting to '%s:%d/%d'" % (options['host'], options['port'], options['db']))
+    restore(options['infile'], use_ttl=options['use_ttl'], bulk_size=options['bulk'], **kw)
   elif mode=='dblist':
     dblist(**kw)
   else:
@@ -157,4 +161,3 @@ def main():
 
 if __name__=='__main__':
   main()
-
