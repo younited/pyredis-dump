@@ -122,7 +122,7 @@ def main():
   db = 0
   parser = optparse.OptionParser(usage="usage: %prog [options] dump|restore|dblist")
   parser.add_option('-H', '--host', help='connect to HOST (default localhost)', default='localhost')
-  parser.add_option('-P', '--port', help='connect to PORT (default 6379)', default=6379, type="int")
+  parser.add_argument('-c', '--config-file', required=False, is_config_file=True, help='config file path')
   parser.add_option('-s', '--socket', help='connect to SOCKET')
   parser.add_option('-d', '--db', help='database', default=0, type="int")
   parser.add_option('-w', '--password', help='connect with PASSWORD')
