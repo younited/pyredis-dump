@@ -3,6 +3,7 @@
 import time
 import optparse
 import ast
+import pathlib
 import re
 from redis import StrictRedis as Redis
 
@@ -92,6 +93,8 @@ class RedisDump(Redis):
 
 def dump(filename, pattern="*", **kw):
   r=RedisDump(**kw)
+  p = pathlib.Path(filename)
+  p.parents[0].mkdir(parents=True, exist_ok=True)
   with open(filename, "w+") as outfile:
     r.dump(outfile, pattern)
 
