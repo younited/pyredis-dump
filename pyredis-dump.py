@@ -151,7 +151,7 @@ def main():
     host = 'localhost'
     db = 0
     parser = configargparse.ArgParser()
-    parser.add_argument('mode', nargs='+', help='[dump|restore|dblist]')
+    parser.add_argument('mode', nargs='+', help='[dblist|dump|restore]')
     parser.add_argument('-c', '--config-file', required=False,
                         is_config_file=True, help='config file path')
     parser.add_argument(
