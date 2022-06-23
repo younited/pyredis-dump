@@ -72,7 +72,7 @@ class RedisDump(Redis):
             for element, score in value:
                 p.zadd(key, score, element)
         elif key_type == b'hash':
-            p.hmset(key, value)
+            p.hset(key, mapping=value)
         else:
             raise TypeError('Unknown type=%r' % type)
         if ttl <= 0:
