@@ -53,10 +53,13 @@ class RedisDump(Redis):
         for key in self.keys(pattern):
             yield self.get_one(key)
 
-    def dump(self, outfile, pattern="*"):
+    def dump(self, outfile=None, pattern="*"):
         for type, key, ttl, expire_at, value in self.pattern_iter(pattern):
             line = repr((type, key, ttl, expire_at, value,))
-            outfile.write(line+"\n")
+            if outfile == None:
+                print(line)
+            else:
+                outfile.write(line+"\n")
 
     def set_one(self, p, use_ttl, key_type, key, ttl, expire_at, value):
         p.delete(key)
@@ -112,10 +115,14 @@ class RedisDump(Redis):
 
 def dump(filename, pattern="*", **kw):
     r = RedisDump(**kw)
-    p = pathlib.Path(filename)
-    p.parents[0].mkdir(parents=True, exist_ok=True)
-    with open(filename, "w+") as outfile:
-        r.dump(outfile, pattern)
+    if filename:
+        p = pathlib.Path(filename)
+        p.parents[0].mkdir(parents=True, exist_ok=True)
+        with open(filename, "w+") as outfile:
+            r.dump(outfile, pattern)
+    else:
+        outfile = None
+        return r.dump(outfile, pattern)
 
 
 def restore(filename, use_ttl=True, bulk_size=1000, **kw):
@@ -177,11 +184,13 @@ def main():
     kw = options2kw(options)
     if mode == 'dump':
         if not options['outfile']:
-            parser.error("missing outfile, use '-o'")
-        print("dumping to %r" % options['outfile'])
-        print("connecting to '%s:%d/%d'" %
-              (options['host'], options['port'], options['db']))
+            options['outfile'] = None
+        else:
+            print("connecting to '%s:%d/%d'" %
+                  (options['host'], options['port'], options['db']))
+            print("dumping to %r" % options['outfile'])
         dump(options['outfile'], options['pattern'], **kw)
+
     elif mode == 'restore':
         if not options['infile']:
             parser.error("missing infile, use '-i'")
