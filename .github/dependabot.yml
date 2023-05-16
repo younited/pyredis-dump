@@ -1,0 +1,27 @@
+# Set update schedule for GitHub Actions
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      # Check for updates to GitHub Actions every week
+      interval: "weekly"
+      # At 06:00 UTC every monday
+      day: "monday"
+      time: "06:00"
+    assignees: 
+      - "trustedbot"
+    reviewers: 
+      - "dysonfrost"
+    labels:
+      - "dependabot"
+      - "actions dependencies"
+    registries:
+      - github
+registries:
+  github:
+    type: git
+    url: https://github.com
+    username: x-access-token # username doesn't matter
+    password: ${{ secrets.DEPENDABOT_PAT }} # dependabot secret
