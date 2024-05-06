@@ -13,7 +13,7 @@ jobs:
       - name: 📫 Checkout
         uses: actions/checkout@v4.1.4
       - name: 💉 Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.1
+        uses: rlespinasse/github-slug-action@v4.5.0
         with:
           short-length: 8
       - name: 🏷️ Set up tags
