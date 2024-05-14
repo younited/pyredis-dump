@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 📫 Checkout
-        uses: actions/checkout@v4.1.4
+        uses: actions/checkout@v4.1.5
       - name: 💉 Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.5.0
         with:
