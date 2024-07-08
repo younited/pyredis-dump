@@ -1,2 +1,2 @@
-ConfigArgParse==1.5.3
-redis==4.3.3
+ConfigArgParse==1.7
+redis==5.0.7
