@@ -18,6 +18,8 @@ class RedisDump(Redis):
 
     def get_one(self, key):
         type = self.type(key)
+        if type == b'none':  # Handle non-existing keys gracefully
+            return None  # Or any other appropriate handling
         p = self.pipeline()
         p.watch(key)
         p.multi()
@@ -51,7 +53,9 @@ class RedisDump(Redis):
 
     def pattern_iter(self, pattern="*"):
         for key in self.keys(pattern):
-            yield self.get_one(key)
+            result = self.get_one(key)
+            if result is not None:
+                yield result
 
     def dump(self, outfile=None, pattern="*"):
         for type, key, ttl, expire_at, value in self.pattern_iter(pattern):
