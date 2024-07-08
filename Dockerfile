@@ -1,6 +1,6 @@
 ARG PYTHON_VERSION=alpine
 
-FROM python:$PYTHON_VERSION as base
+FROM python:$PYTHON_VERSION AS base
 
 ENV APP_ROOT=/app
 WORKDIR $APP_ROOT
@@ -12,7 +12,7 @@ COPY requirements.txt .
 RUN python -m pip install --upgrade pip && \
     python -m pip install -r requirements.txt
 
-FROM base as compile
+FROM base AS compile
 
 ENV USER_ID=65535
 ENV GROUP_ID=65535
